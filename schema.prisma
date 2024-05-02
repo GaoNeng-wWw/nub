@@ -1,0 +1,27 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model Post {
+  id       Int      @id @default(autoincrement())
+  title    String
+  Content  String
+  createAt DateTime @unique @default(now())
+  updateAt DateTime @unique @updatedAt
+  publish  Boolean  @default(true)
+  Tag      Tag[]    @relation("PostToTag")
+}
+
+model Tag {
+  id       Int      @id @default(autoincrement())
+  key      String   @unique
+  createAt DateTime @unique @default(now())
+  updateAt DateTime @unique
+  Post     Post[]   @relation("PostToTag")
+}
