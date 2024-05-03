@@ -10,18 +10,40 @@ datasource db {
 
 model Post {
   id       Int      @id @default(autoincrement())
-  title    String
-  Content  String
+  title    String   @db.Char(255)
+  Content  String   @db.Text
   createAt DateTime @unique @default(now())
   updateAt DateTime @unique @updatedAt
   publish  Boolean  @default(true)
   Tag      Tag[]    @relation("PostToTag")
+
+  @@index([id])
 }
 
 model Tag {
   id       Int      @id @default(autoincrement())
-  key      String   @unique
+  name     String   @unique @db.Char(255)
   createAt DateTime @unique @default(now())
-  updateAt DateTime @unique
+  updateAt DateTime @unique @updatedAt
   Post     Post[]   @relation("PostToTag")
+
+  @@index([id])
+}
+
+model Comment {
+  commentId       String   @id @default(uuid())
+  content         String   @unique @db.Char(255)
+  parentCommentId String?
+  createAt        DateTime @default(now())
+  updateAt        DateTime @updatedAt
+  postId          Int
+  author          User     @relation(fields: [authorId], references: [id])
+  authorId        Int
+  @@index([authorId, commentId, parentCommentId, postId])
+}
+
+model User {
+  id      Int       @id
+  Comment Comment[]
+  @@index([id])
 }

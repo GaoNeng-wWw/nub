@@ -7,7 +7,7 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare && pnpm prisma db pull && pnpm prisma generate",
+    "postinstall": "nuxt prepare && pnpm prisma db push && pnpm prisma generate",
     "prisma": "prisma",
     "lint": "eslint ."
   },
@@ -15,16 +15,19 @@
     "@nuxt/kit": "^3.11.2",
     "@nuxtjs/tailwindcss": "^6.12.0",
     "@prisma/client": "^5.13.0",
+    "i18next": "^23.11.3",
     "ioredis": "^5.4.1",
     "nuxt": "^3.11.2",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0",
-    "zod": "^3.23.5"
+    "zod": "^3.23.5",
+    "zod-i18n-map": "^2.27.0"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^2.16.1",
     "@types/node": "^20.12.8",
     "eslint": "^9.1.1",
+    "jsonwebtoken": "^9.0.2",
     "prisma": "^5.13.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
