@@ -37,13 +37,25 @@ model Comment {
   createAt        DateTime @default(now())
   updateAt        DateTime @updatedAt
   postId          Int
+  authorId        String
   author          User     @relation(fields: [authorId], references: [id])
-  authorId        Int
+
   @@index([authorId, commentId, parentCommentId, postId])
 }
 
 model User {
-  id      Int       @id
-  Comment Comment[]
+  id       String    @id @default(uuid()) // UUID or OAuth id
+  username String? // username
+  password String? // password
+  profile  Profile?
+  comment  Comment[]
+  is_oauth Boolean   @default(false)
+  @@index([id,username])
+}
+
+model Profile {
+  id   String @id // UUID or OAuth id
+  name String @unique
+  user User   @relation(fields: [id], references: [id])
   @@index([id])
 }
