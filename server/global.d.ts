@@ -15,5 +15,8 @@ declare namespace NodeJS {
     NUB_KV_REST_API_URL: string
     NUB_KV_REST_API_TOKEN: string
     NUB_KV_REST_API_READ_ONLY_TOKEN: string
+    JWT_EXPIRE: string
+    JWT_ALGORITHM: string
+    JWT_SECRET: string
   }
 }

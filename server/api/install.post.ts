@@ -1,38 +1,65 @@
 import { env } from 'node:process';
+import { useLogger } from '@nuxt/kit';
+import { storeJWT } from '../utils/useJWT';
 
 const InstallSchema = z.object({
-  userName: z.string({ required_error: '管理员用户名必须存在' }),
-  password: z.string({ required_error: '密码必须存在' }),
   siteName: z.string({ required_error: '必须设置一个站点名称' }),
   avatarUrl: z.string().optional(),
-  client_id: z.string().min(1).default(env.client_id ?? ''),
-  redirect_url: z.string().min(1).default(env.redirect_url ?? ''),
-  client_secret: z.string().min(1).default(env.client_secret ?? ''),
+  username: z.string(),
+  password: z.string(),
 })
-
 export default defineEventHandler(async (ctx) => {
+  const logger = useLogger('Install')
+  logger.info('Start Install');
   const body = await readBody(ctx);
   const { success, error, data } = InstallSchema.safeParse(body);
+  logger.info('Parse body')
   if (!success) {
+    logger.warn('Body invalide');
     return createError({
       statusCode: 400,
       message: error.errors[0].message,
     })
   }
-  const { userName, password, siteName, avatarUrl, client_id, redirect_url, client_secret } = data;
+  const { siteName, avatarUrl, username, password } = data;
   const { isInstall, installSite } = useSite()
   if (await isInstall()) {
+    logger.warn('Site is installed')
     return true;
   }
-  return installSite({
-    userName,
-    password,
+  const installState = installSite({
     siteName,
     avatarUrl,
-    client_id,
-    redirect_url,
     postTotal: 0,
-    client_secret,
+    userTotal: 0,
   })
-    .then(() => true);
+    .then(() => true)
+    .catch((reason) => {
+      logger.error(reason);
+      return false;
+    })
+  if (!await installState) {
+    return createError({
+      status: 500,
+      message: '未知错误, 请查看日志',
+    })
+  }
+  const db = useDatabase();
+  const _password = usePassword(password)
+  const { id } = await db.user.create({
+    data: {
+      username,
+      password: _password,
+      profile: {
+        create: {
+          name: username,
+        },
+      },
+      comment: {
+        create: [],
+      },
+    },
+  })
+  const jwt = useJWT({ id });
+  return await storeJWT(jwt, id);
 })

@@ -1,12 +1,8 @@
 interface SiteInfo {
   siteName: string
   postTotal: number
-  userName: string
-  password: string
   avatarUrl?: string
-  client_id: string
-  redirect_url: string
-  client_secret: string
+  userTotal: number
 }
 const NS = 'siteinfo';
 let cache: SiteInfo | null = null
