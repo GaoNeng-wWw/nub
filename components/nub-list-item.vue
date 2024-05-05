@@ -11,7 +11,7 @@ const humanDate = computed(() => {
   const dateObj = new Date(date.value);
   const month = dateObj.getMonth() + 1;
   const day = dateObj.getDate();
-  return [dateObj.getFullYear(), `${month > 10 ? month : `0${month}`}`, `${day > 10 ? date : `0${day}`}`]
+  return [dateObj.getFullYear(), `${month > 10 ? month : `0${month}`}`, `${day > 10 ? date : `0${day}`}`].join('/')
 })
 </script>
 
@@ -26,9 +26,9 @@ const humanDate = computed(() => {
           <span>{{ humanDate }}</span>
         </div>
         <template v-for="(tag, idx) of tags" :key="idx">
-          <div class="h-full px-2 py-0.5 bg-blue-500 text-white rounded">
+          <nub-tag>
             # {{ tag }}
-          </div>
+          </nub-tag>
         </template>
       </div>
     </div>
