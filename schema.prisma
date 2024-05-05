@@ -45,17 +45,20 @@ model Comment {
 
 model User {
   id       String    @id @default(uuid()) // UUID or OAuth id
-  username String? // username
-  password String? // password
+  username String // username
+  password String // password
   profile  Profile?
   comment  Comment[]
+  is_admin  Boolean @default(false)
   is_oauth Boolean   @default(false)
-  @@index([id,username])
+
+  @@index([id, username, password])
 }
 
 model Profile {
   id   String @id // UUID or OAuth id
   name String @unique
   user User   @relation(fields: [id], references: [id])
+
   @@index([id])
 }
