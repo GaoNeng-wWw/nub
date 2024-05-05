@@ -8,7 +8,7 @@ export default defineEventHandler(async (ctx) => {
   const body = await readBody(ctx);
   const { success, error, data } = CreatePostSchema.safeParse(body)
   if (!success) {
-    return createError({
+    throw createError({
       statusCode: 400,
       message: error.issues[0].message,
     })
@@ -27,7 +27,8 @@ export default defineEventHandler(async (ctx) => {
       },
     },
     select: {
-      Content: false,
+      id: true,
+      title: true,
     },
   })
 })

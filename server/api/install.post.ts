@@ -1,5 +1,4 @@
 import { env } from 'node:process';
-import { useLogger } from '@nuxt/kit';
 import { storeJWT } from '../utils/useJWT';
 
 const InstallSchema = z.object({
@@ -9,13 +8,9 @@ const InstallSchema = z.object({
   password: z.string(),
 })
 export default defineEventHandler(async (ctx) => {
-  const logger = useLogger('Install')
-  logger.info('Start Install');
   const body = await readBody(ctx);
   const { success, error, data } = InstallSchema.safeParse(body);
-  logger.info('Parse body')
   if (!success) {
-    logger.warn('Body invalide');
     return createError({
       statusCode: 400,
       message: error.errors[0].message,
@@ -24,7 +19,6 @@ export default defineEventHandler(async (ctx) => {
   const { siteName, avatarUrl, username, password } = data;
   const { isInstall, installSite } = useSite()
   if (await isInstall()) {
-    logger.warn('Site is installed')
     return true;
   }
   const installState = installSite({
@@ -35,7 +29,6 @@ export default defineEventHandler(async (ctx) => {
   })
     .then(() => true)
     .catch((reason) => {
-      logger.error(reason);
       return false;
     })
   if (!await installState) {
