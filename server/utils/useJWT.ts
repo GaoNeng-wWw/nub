@@ -1,9 +1,9 @@
 import { env } from 'node:process';
-import { verify as _verify, sign } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import type { Algorithm } from 'jsonwebtoken';
 
 export const useJWT = (content: Record<string, any>) => {
-  return sign(content, env.JWT_SECRET, {
+  return jwt.sign(content, env.JWT_SECRET, {
     algorithm: env.JWT_ALGORITHM as Algorithm,
     expiresIn: env.JWT_EXPIRE,
   })
@@ -17,7 +17,7 @@ export const storeJWT = (token: string, id: string) => {
 }
 
 export const veirfyJWT = (token: string) => {
-  return _verify(token, env.JWT_SECRET, {
+  return jwt.verify(token, env.JWT_SECRET, {
     algorithms: [env.JWT_ALGORITHM] as Algorithm[],
   })
 }
@@ -25,4 +25,9 @@ export const veirfyJWT = (token: string) => {
 export const verifyJWTAtRedis = async (token: string) => {
   const redis = useRedis();
   return Boolean(await redis.exists(`TOKEN:${token}`));
+}
+
+export const getIdByToken = (token: string) => {
+  const redis = useRedis();
+  return redis.get(`TOKEN:${token}`);
 }
