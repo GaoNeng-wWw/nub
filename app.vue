@@ -1,5 +1,5 @@
 <template>
-  <div class="w-screen h-screen px-2 bg-zinc-100">
+  <div class="max-w-screen h-screen bg-zinc-100">
     <nuxt-page />
   </div>
 </template>
