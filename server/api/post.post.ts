@@ -1,7 +1,8 @@
 const CreatePostSchema = z.object({
-  title: z.string(),
-  content: z.string(),
-  tags: z.array(z.string()),
+  title: z.string().min(1, '标题不能为空'),
+  content: z.string().min(1, '正文不能为空'),
+  tags: z.array(z.string()).min(1, '至少要有一个标签'),
+  publish: z.boolean().default(true),
 })
 
 export default defineEventHandler(async (ctx) => {
@@ -14,6 +15,18 @@ export default defineEventHandler(async (ctx) => {
     })
   }
   const db = useDatabase();
+  const post = await db.post.findFirst({
+    where: {
+      title: data.title,
+    },
+  })
+  if (post) {
+    throw createError({
+      status: 400,
+      message: '文章已存在',
+      fatal: false,
+    })
+  }
   return await db.post.create({
     data: {
       title: data.title,
@@ -25,6 +38,7 @@ export default defineEventHandler(async (ctx) => {
           }
         }),
       },
+      publish: data.publish,
     },
     select: {
       id: true,
