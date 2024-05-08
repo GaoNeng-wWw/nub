@@ -4,7 +4,7 @@ import type { H3Error } from 'h3';
 interface Post {
   title: string
   content: string
-  tags: string[]
+  tags: { id: number }[]
   publish: boolean
 }
 
