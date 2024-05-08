@@ -1,7 +1,9 @@
 const CreatePostSchema = z.object({
   title: z.string().min(1, '标题不能为空'),
   content: z.string().min(1, '正文不能为空'),
-  tags: z.array(z.string()).min(1, '至少要有一个标签'),
+  tags: z.array(z.object({
+    id: z.number(),
+  })).min(1, '至少要有一个标签'),
   publish: z.boolean().default(true),
 })
 
@@ -32,11 +34,7 @@ export default defineEventHandler(async (ctx) => {
       title: data.title,
       Content: data.content,
       Tag: {
-        create: data.tags.map((tag) => {
-          return {
-            name: tag,
-          }
-        }),
+        connect: [...data.tags],
       },
       publish: data.publish,
     },
