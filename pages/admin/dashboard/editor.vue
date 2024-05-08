@@ -14,12 +14,15 @@ const renderGraph = useDebounceFn(async () => {
 }, 1300)
 const { addPost } = usePost();
 const toast = useNuxtApp().$toast;
-const { tags, error } = useTags();
-watch(tags, () => {
-  console.log(tags.value)
-}, { immediate: true })
-const createPost = () => {
-  const { status, error, reason } = addPost({ title: title.value, content: content.value, tags: [], publish: true })
+const showTagSelect = ref(false);
+
+const publishPost = (tags: { id: number, name: string, updateAt: string, createAt: string }[]) => {
+  const { status, error, reason } = addPost({
+    title: title.value,
+    content: content.value,
+    tags: tags.map(t => ({ id: t.id })),
+    publish: true,
+  })
   const stop = watch(status, () => {
     if (error.value) {
       toast.error(reason.value.message)
@@ -29,6 +32,9 @@ const createPost = () => {
     }
     stop();
   })
+}
+const createPost = () => {
+  showTagSelect.value = true;
 }
 </script>
 
@@ -64,8 +70,10 @@ const createPost = () => {
         <div class="prose py-8 px-2 !max-w-none overflow-scroll" v-html="html" />
       </client-only>
     </div>
-    <nub-modal>
-      <tag-modal />
+    <nub-modal v-if="showTagSelect">
+      <div class="w-64 p-4 bg-zinc-50">
+        <nub-tag-select @ok="publishPost" />
+      </div>
     </nub-modal>
   </div>
 </template>
