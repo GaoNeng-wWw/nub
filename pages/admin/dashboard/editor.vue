@@ -14,7 +14,7 @@ const renderGraph = useDebounceFn(async () => {
 }, 1300)
 const { addPost } = usePost();
 const toast = useNuxtApp().$toast;
-const showTagSelect = ref(false);
+const tagSelectVisible = ref(false);
 
 const publishPost = (tags: { id: number, name: string, updateAt: string, createAt: string }[]) => {
   const { status, error, reason } = addPost({
@@ -33,8 +33,16 @@ const publishPost = (tags: { id: number, name: string, updateAt: string, createA
     stop();
   })
 }
-const createPost = () => {
-  showTagSelect.value = true;
+const showTagSelect = () => {
+  if (!title.value) {
+    toast.error('标题不能为空');
+    return;
+  }
+  if (!content.value) {
+    toast.error('内容不能为空');
+    return;
+  }
+  tagSelectVisible.value = Boolean(title.value && content.value);
 }
 </script>
 
@@ -50,7 +58,7 @@ const createPost = () => {
         <input v-model="title" class="w-64 h-10 p-2 rounded-md outline-none bg-white">
       </div>
       <div class="flex gap-2">
-        <Button type="primary" icon-only @click="createPost">
+        <Button type="primary" icon-only @click="showTagSelect">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 rotate-[180deg]">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
           </svg>
@@ -70,9 +78,9 @@ const createPost = () => {
         <div class="prose py-8 px-2 !max-w-none overflow-scroll" v-html="html" />
       </client-only>
     </div>
-    <nub-modal v-if="showTagSelect">
+    <nub-modal v-if="tagSelectVisible">
       <div class="w-64 p-4 bg-zinc-50">
-        <nub-tag-select @ok="publishPost" />
+        <nub-tag-select @ok="publishPost" @cancel="() => tagSelectVisible = false" />
       </div>
     </nub-modal>
   </div>
