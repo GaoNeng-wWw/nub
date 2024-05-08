@@ -28,6 +28,7 @@
     "@shikijs/markdown-it": "^1.4.0",
     "@shikijs/transformers": "^1.4.0",
     "@tailwindcss/typography": "^0.5.13",
+    "@vueuse/components": "^10.9.0",
     "@vueuse/core": "^10.9.0",
     "@vueuse/nuxt": "^10.9.0",
     "i18next": "^23.11.3",
