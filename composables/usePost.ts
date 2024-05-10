@@ -66,5 +66,5 @@ export const usePost = () => {
       reason,
     }
   }
-  return { addPost }
+  return { addPost,getMemeTitle}
 }
