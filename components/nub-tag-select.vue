@@ -8,9 +8,14 @@ const emits = defineEmits<{
   cancel: []
 }>()
 
+const [selected] = defineModel<{ id: number, name: string, createAt: string, updateAt: string }[]>('selcted')
+
 const { tags, appendTag } = useTags();
 const tagData = ref<{ id: number, name: string, createAt: string, updateAt: string }[]>(tags.value?.tags ?? []);
-const selectedTags = ref<{ id: number, name: string, createAt: string, updateAt: string }[]>([]);
+watch(tags, () => {
+  tagData.value = tags.value?.tags ?? [];
+}, { immediate: true, deep: true })
+const selectedTags = ref<{ id: number, name: string, createAt: string, updateAt: string }[]>(selected.value ?? []);
 const selectedTagsId = computed(() => selectedTags.value.map(t => t.id));
 const visible = ref(false);
 const currentTag = ref('');

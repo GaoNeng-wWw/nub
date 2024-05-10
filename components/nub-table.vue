@@ -4,23 +4,18 @@ const props = defineProps<{
     id: string
     label: string
   }[]
-  data: {
-    [id: string]: any
-  }[]
+  data: any[]
   border: boolean
+  loading: boolean
 }>();
-const { index, data, border } = toRefs(props);
+const { index, data, border, loading } = toRefs(props);
 const slots = useSlots();
 </script>
 
 <template>
-  <div
-    :class="{
-      // 'border border-zinc-300': border,
-    }"
-  >
+  <div>
     <table
-      class="w-full overflow-hidden rounded-md"
+      class="w-full overflow-hidden rounded-md relative"
     >
       <colgroup>
         <col v-for="item of index" :key="item.id" style="width:100px">
@@ -48,8 +43,6 @@ const slots = useSlots();
                 'first:border-l first:border-r last:border-r': border,
                 'border-r': border && indexIdx > 0 && indexIdx < index.length,
               }"
-              :rowspan="border ? 1 : 0"
-              :colspan="border ? 1 : 0"
             >
               <div v-if="!slots[id]" :key="id" class="px-2">
                 {{ tableData[id] }}
@@ -61,6 +54,9 @@ const slots = useSlots();
           </template>
         </tr>
       </tbody>
+      <nub-fade>
+        <nub-loading v-if="loading" />
+      </nub-fade>
     </table>
   </div>
 </template>

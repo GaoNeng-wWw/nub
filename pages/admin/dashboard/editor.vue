@@ -4,34 +4,52 @@ import mermaid from 'mermaid';
 import { MdEditor } from 'md-editor-v3';
 import 'md-editor-v3/lib/style.css';
 
-const content = ref('');
-const title = ref('');
+const { addPost, fetchPost, patchPost, title, content, isPatch, tags } = usePost();
+
+const route = useRoute();
+const router = useRouter();
+const id = route.query.id as string;
 const md = useNuxtApp().$md();
 const html = computed(() => md.render(content.value));
 mermaid.initialize({ startOnLoad: false });
 const renderGraph = useDebounceFn(async () => {
   await mermaid.run()
 }, 1300)
-const { addPost } = usePost();
 const toast = useNuxtApp().$toast;
 const tagSelectVisible = ref(false);
 
-const publishPost = (tags: { id: number, name: string, updateAt: string, createAt: string }[]) => {
-  const { status, error, reason } = addPost({
-    title: title.value,
-    content: content.value,
-    tags: tags.map(t => ({ id: t.id })),
-    publish: true,
-  })
-  const stop = watch(status, () => {
-    if (error.value) {
-      toast.error(reason.value.message)
-    }
-    if (status.value === 'success') {
-      toast.success('文章发布成功')
-    }
-    stop();
-  })
+const publishOrPatch = (tags: { id: number, name: string, updateAt: string, createAt: string }[]) => {
+  if (isPatch.value) {
+    patchPost({
+      title: title.value,
+      Content: content.value,
+      Tag: tags.map(t => ({ id: t.id })),
+      publish: true,
+      id,
+    })
+      .then(() => {
+        toast.success('文章更新成功!');
+      })
+      .catch((err) => {
+        toast.error(err.message ?? '未知错误');
+      })
+  } else {
+    const { status, error, reason } = addPost({
+      title: title.value,
+      content: content.value,
+      tags: tags.map(t => ({ id: t.id })),
+      publish: true,
+    })
+    const stop = watch(status, () => {
+      if (error.value) {
+        toast.error(reason.value.message)
+      }
+      if (status.value === 'success') {
+        toast.success('文章发布成功')
+      }
+      stop();
+    })
+  }
 }
 const showTagSelect = () => {
   if (!title.value) {
@@ -43,6 +61,15 @@ const showTagSelect = () => {
     return;
   }
   tagSelectVisible.value = Boolean(title.value && content.value);
+}
+if (id) {
+  const { status, error } = await fetchPost(id);
+  watch(status, () => {
+    if (status.value === 'error') {
+      toast.error(error.value?.message ?? '未知错误');
+      router.replace('/');
+    }
+  }, { immediate: true });
 }
 </script>
 
@@ -63,11 +90,13 @@ const showTagSelect = () => {
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
           </svg>
         </Button>
-        <!-- TODO: Publish daft post -->
       </div>
     </div>
-    <div class="w-full flex-auto grid grid-cols-2 min-h-0">
+    <div class="w-full flex-auto grid grid-cols-2 min-h-0 relative">
       <client-only>
+        <template #fallback>
+          <nub-loading />
+        </template>
         <MdEditor
           v-model="content"
           editor-id="admin"
@@ -80,7 +109,7 @@ const showTagSelect = () => {
     </div>
     <nub-modal v-if="tagSelectVisible">
       <div class="w-64 p-4 bg-zinc-50">
-        <nub-tag-select @ok="publishPost" @cancel="() => tagSelectVisible = false" />
+        <nub-tag-select v-model:selcted="tags" @ok="publishOrPatch" @cancel="() => tagSelectVisible = false" />
       </div>
     </nub-modal>
   </div>

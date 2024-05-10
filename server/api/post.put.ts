@@ -1,3 +1,5 @@
+import { useSiteInfo } from '~/composables/useSiteInfo';
+
 const CreatePostSchema = z.object({
   title: z.string().min(1, '标题不能为空'),
   content: z.string().min(1, '正文不能为空'),
@@ -29,7 +31,7 @@ export default defineEventHandler(async (ctx) => {
       fatal: false,
     })
   }
-  return await db.post.create({
+  const newPost = await db.post.create({
     data: {
       title: data.title,
       Content: data.content,
@@ -43,4 +45,8 @@ export default defineEventHandler(async (ctx) => {
       title: true,
     },
   })
+  const site = useSite();
+  const siteInfo = await site.getSiteInfo();
+  await site.patchSiteInfo('postTotal', siteInfo.postTotal + 1)
+  return newPost;
 })

@@ -19,8 +19,9 @@ const { showClose } = toRefs(props);
     }"
   >
     <slot />
-    <nub-fade>
+    <nub-fade appear>
       <svg
+        v-if="showClose"
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"

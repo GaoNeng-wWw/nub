@@ -1,5 +1,6 @@
 import type { Tag } from '@prisma/client';
 import type { H3Error } from 'h3';
+import { isEmpty } from 'ramda';
 
 interface Post {
   title: string
@@ -9,6 +10,10 @@ interface Post {
 }
 
 export const usePost = () => {
+  const title = ref('');
+  const content = ref('');
+  const tags = ref<{ id: number, name: string, createAt: string, updateAt: string }[]>([])
+  const isPatch = ref(false);
   const dateString = () => {
     const date = new Date();
     return [
@@ -66,5 +71,61 @@ export const usePost = () => {
       reason,
     }
   }
-  return { addPost,getMemeTitle}
+  const deletePost = (id: number) => {
+    const { data, error, status, reason } = useReturn();
+    $fetch('/api/post', {
+      method: 'delete',
+      onResponseError({ response: { _data } }) {
+        reason.value = _data.message;
+        status.value = 'error';
+        error.value = true;
+      },
+      query: {
+        id,
+      },
+    })
+      .then(() => {
+        status.value = 'success';
+      });
+    return {
+      data,
+      error,
+      status,
+      reason,
+    }
+  }
+  const fetchPost = async (id?: string) => {
+    if (id && !Number.isNaN(Number.parseInt(id))) {
+      isPatch.value = true;
+    }
+    const { data, error, status } = await useAsyncData(`post-${id}`, () => $fetch('/api/post', { query: { id }, method: 'get' }));
+    watch(data, () => {
+      if (!data.value) {
+        isPatch.value = false;
+        return;
+      }
+      title.value = data.value.title;
+      content.value = data.value.Content
+      tags.value = data.value.Tag as unknown as { id: number, name: string, createAt: string, updateAt: string }[]
+    }, { immediate: true })
+    return { data, error, status, title, content, tags };
+  }
+  const patchPost = (
+    post: Exclude<Partial<Post> & { id: string }, 'tag' | 'content'> & { Tag: { id: number }[], Content: string },
+  ) => {
+    if (isEmpty(post)) {
+      return Promise.resolve();
+    }
+    return new Promise((resolve, reject) => {
+      $fetch('/api/post', {
+        method: 'patch',
+        body: { ...post },
+        onResponseError({ response: { _data } }) {
+          reject(_data)
+        },
+      })
+        .then(() => resolve(true))
+    })
+  }
+  return { addPost, getMemeTitle, deletePost, fetchPost, patchPost, title, content, isPatch, tags }
 }
