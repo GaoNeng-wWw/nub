@@ -17,7 +17,7 @@ const index = [
 ]
 
 const { $toast } = useNuxtApp();
-const { posts, loading, deletePost, patchPost } = usePosts($toast);
+const { posts, loading, deletePost, patchPost, totalPages, loadPage } = usePosts($toast);
 </script>
 
 <template>
@@ -49,5 +49,6 @@ const { posts, loading, deletePost, patchPost } = usePosts($toast);
         </div>
       </template>
     </nub-table>
+    <nub-pagination v-if="totalPages > 1" :page-total="totalPages" @page-change="loadPage" />
   </div>
 </template>

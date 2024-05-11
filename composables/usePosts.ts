@@ -22,6 +22,7 @@ export const usePosts = (
 ) => {
   const loading = ref(false);
   const page = ref(initializedPage)
+  const totalPages = ref(1);
   const nextPage = () => page.value += 1;
   const prevPage = () => page.value -= 1;
   const { data } = useAsyncData('posts', () => {
@@ -32,6 +33,7 @@ export const usePosts = (
   const posts = ref<SerializeObject<UnSerializeObject>[]>([]);
   watch(data, () => {
     posts.value = data.value?.posts ?? [];
+    totalPages.value = data.value?.pages ?? 1;
   }, { immediate: true })
   const deletePost = (
     id: number,
@@ -55,13 +57,18 @@ export const usePosts = (
     const router = useRouter();
     router.replace(`/admin/dashboard/editor?id=${id}`);
   }
+  const loadPage = (_page: number) => {
+    page.value = _page;
+  }
   return {
     posts,
     loading,
     page,
+    totalPages,
     nextPage,
     prevPage,
     deletePost,
     patchPost,
+    loadPage,
   }
 }
