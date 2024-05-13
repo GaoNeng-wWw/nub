@@ -3,6 +3,10 @@ import { Button } from '@miraiui-org/vue-button';
 import { TransitionCollapse } from '@miraiui-org/vue-transition-collapse';
 import { vOnClickOutside } from '@vueuse/components';
 
+const props = defineProps<{
+  okLoading?: boolean
+}>()
+
 const emits = defineEmits<{
   ok: [{ id: number, name: string, createAt: string, updateAt: string }[]]
   cancel: []
@@ -164,7 +168,7 @@ const inputEl = ref<HTMLElement | null>();
       </div>
     </TransitionCollapse>
     <div class="w-full flex gap-2 justify-end">
-      <Button type="primary" @click.stop="() => emits('ok', selectedTags)">
+      <Button :loading="props.okLoading" type="primary" @click.stop="() => emits('ok', selectedTags)">
         提交
       </Button>
       <Button @click.stop="() => emits('cancel')">

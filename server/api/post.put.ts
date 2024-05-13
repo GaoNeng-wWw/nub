@@ -47,6 +47,6 @@ export default defineEventHandler(async (ctx) => {
   })
   const site = useSite();
   const siteInfo = await site.getSiteInfo();
-  await site.patchSiteInfo('postTotal', siteInfo.postTotal + 1)
+  await site.patchSiteInfo('postTotal', Number.parseInt(siteInfo.postTotal.toString()) + 1)
   return newPost;
 })

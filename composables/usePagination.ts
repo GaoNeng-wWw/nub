@@ -17,6 +17,7 @@ export const usePagination = (
   props: ToRefs<PaginationProps>,
   initializationPage: number = 1,
 ) => {
+  debugger;
   const { pageTotal, pagerCount } = props;
   const current = ref(initializationPage);
   const halfTotal = computed(() => (pagerCount.value - 1) / 2)

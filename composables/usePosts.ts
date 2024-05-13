@@ -20,21 +20,25 @@ export const usePosts = (
   $toast: typeof toast,
   initializedPage = 1,
 ) => {
-  const loading = ref(false);
+  const loading = ref(true);
   const page = ref(initializedPage)
   const totalPages = ref(1);
   const nextPage = () => page.value += 1;
   const prevPage = () => page.value -= 1;
-  const { data } = useAsyncData('posts', () => {
-    return $fetch('/api/posts', { method: 'get', query: { page } });
+  const { data, status } = useAsyncData('posts', () => {
+    return $fetch('/api/posts', { method: 'get', query: { page: page.value } });
   }, {
     watch: [page],
+    server: false,
   });
   const posts = ref<SerializeObject<UnSerializeObject>[]>([]);
   watch(data, () => {
     posts.value = data.value?.posts ?? [];
     totalPages.value = data.value?.pages ?? 1;
   }, { immediate: true })
+  watch(status, () => {
+    loading.value = status.value === 'pending'
+  })
   const deletePost = (
     id: number,
     post: SerializeObject<UnSerializeObject>,
@@ -43,8 +47,11 @@ export const usePosts = (
     loading.value = true;
     const postIdx = posts.value.indexOf(post);
     const { error, reason, status } = _deletePost(id)
-    watchOnce(status, () => {
-      loading.value = status.value === 'pending'
+    watch(status, () => {
+      loading.value = status.value === 'pending';
+      if (!loading.value) {
+        posts.value.splice(postIdx, 1);
+      }
     }, { immediate: true });
     watchOnce(error, () => {
       if (error.value) {

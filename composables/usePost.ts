@@ -10,10 +10,6 @@ interface Post {
 }
 
 export const usePost = () => {
-  const title = ref('');
-  const content = ref('');
-  const tags = ref<{ id: number, name: string, createAt: string, updateAt: string }[]>([])
-  const isPatch = ref(false);
   const dateString = () => {
     const date = new Date();
     return [
@@ -32,6 +28,10 @@ export const usePost = () => {
   const getMemeTitle = () => {
     return `开始于${dateString()}的杰作`;
   }
+  const title = ref('');
+  const content = ref('');
+  const tags = ref<{ id: number, name: string, createAt: string, updateAt: string }[]>([])
+  const isPatch = ref(false);
   const addPost = (post: Post = {
     content: '',
     title: getMemeTitle(),
@@ -45,7 +45,7 @@ export const usePost = () => {
       _title.value = getMemeTitle();
     }
     $fetch('/api/post', {
-      method: 'post',
+      method: 'put',
       body: {
         title,
         content,
