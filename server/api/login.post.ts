@@ -28,5 +28,6 @@ export default defineEventHandler(async (ctx) => {
   }
   const jwt = useJWT({ id: userInfo.id });
   await storeJWT(jwt, userInfo.id);
+  setCookie(ctx, 'token', jwt, { httpOnly: true })
   return { token: jwt }
 })
