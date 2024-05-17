@@ -1,6 +1,5 @@
 import { env } from 'node:process';
 import { Octokit } from '@octokit/core';
-import { logger } from '@nuxt/kit';
 
 export default defineEventHandler(async (ctx) => {
   const { code } = getQuery(ctx);
@@ -46,7 +45,6 @@ export default defineEventHandler(async (ctx) => {
     .then(({ data: { id } }) => id)
     .catch(reason => reason)
   if (typeof idLike === 'string') {
-    logger.error(idLike);
     createError(idLike);
     return;
   }

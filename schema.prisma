@@ -22,7 +22,7 @@ model Post {
 
 model Tag {
   id       Int      @id @default(autoincrement())
-  name     String   @unique @db.Char(255)
+  name     String   @unique @db.VarChar(255)
   createAt DateTime @unique @default(now())
   updateAt DateTime @unique @updatedAt
   Post     Post[]   @relation("PostToTag")
@@ -32,7 +32,7 @@ model Tag {
 
 model Comment {
   commentId       String   @id @default(uuid())
-  content         String   @unique @db.Char(255)
+  content         String   @unique @db.VarChar(255)
   parentCommentId String?
   createAt        DateTime @default(now())
   updateAt        DateTime @updatedAt

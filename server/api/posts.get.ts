@@ -1,7 +1,5 @@
 const GetPostParams = z.object({
-  page: z.number()
-    .gte(1, { message: 'size不应该小于1' })
-    .default(1),
+  page: z.coerce.number(),
   size: z.number()
     .gte(0, { message: 'page不应该小于0' })
     .default(10),
